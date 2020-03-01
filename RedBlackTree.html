@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<header>
+
+	<title>REDBLACK TREE VISUALIZER</title>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=3.0, minimum-scale=0.86">
+	
+	<!--style sheet-->
+	<link rel="stylesheet" href="Tree.css">
+
+	<!-- BOOTSTRAP -->
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+	  
+</header>
+
+<body onresize="resizeTree()">
+
+
+<!-- BUTTONS START -->
+<div class="head">
+	<div class="dropdown title">
+		<button class="dropbtn">
+		<span class="glyphicon glyphicon-menu-right " aria-hidden="true"></span>
+		REDBLACK TREE VISUALIZER.
+		</button>
+		<div class="dropdown-content">
+			<a href="BinaryTree.html"><span class="glyphicon glyphicon-menu-right " aria-hidden="true"></span> BINARY TREE VISUALIZER</a>
+			<a href="#"><span class="glyphicon glyphicon-menu-right " aria-hidden="true"></span> COMING SOON...</a>
+		</div>
+	</div>
+
+	<div class="row inputs">
+	&nbsp;
+	<input type="text" class="input" id="insert" value="" placeholder="Add Value">
+	
+	<span class="btn-wrap">
+	<button class="btn btn-primary a-btn-slide-text" onclick="addElement()">
+        <span class="glyphicon glyphicon-plus ico" aria-hidden="true"></span>
+        <span class="ico"><strong>Add</strong></span>  
+			</button>
+	</span>
+	&nbsp;&nbsp;
+	<input type="text" class="input" id="delete" value="" placeholder="Delete Value">
+	
+	<span class="btn-wrap">
+    <button class="btn btn-primary a-btn-slide-text" onclick="deleteElement()">
+       <span class="glyphicon glyphicon-trash ico" aria-hidden="true"></span>
+        <span><strong>Delete</strong></span> 
+		</button>
+</span>		
+	&nbsp;&nbsp;
+	<input type="text" class="input" id="search" value="" placeholder="Search Value">
+	
+	<span class="btn-wrap">
+	<button class="btn btn-primary a-btn-slide-text" onclick="findElement()">
+        <span class="glyphicon glyphicon-eye-open ico" aria-hidden="true"></span>
+        <span><strong>Search</strong></span> 
+		</button>
+</span>		
+	&nbsp;
+	<span class="btn-wrap">
+	<button class="btn btn-primary a-btn-slide-text" onclick="reset()">
+        <span class="glyphicon glyphicon-repeat ico" aria-hidden="true"></span>
+        <span><strong>Reset</strong></span> 
+</button>		
+	</span>		
+</div>
+</div>
+<!-- BUTTONS END -->
+
+<!-- TREE AREA -->
+<div id="tree">
+<div id="addNode"><h1>Add Nodes To Build Tree.</h1></div>
+</div>
+<div id="branch">
+</div>
+<!-- TREE END -->
+
+
+<!------------- Draggable DIV ------------->
+<div id="mydiv" style="visibility:hidden;">
+  <div id="mydivheader">SEARCH RESULTS</div>
+  <div id="mydivbody"></div>
+</div>
+<script>
+document.getElementById('mydiv').style.visibility = "hidden";
+
+function dragElement(elmnt) {
+  var pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
+  if (document.getElementById(elmnt.id + "header")) {
+    // if present, the header is where you move the DIV from:
+    document.getElementById(elmnt.id + "header").onmousedown = dragMouseDown;
+  } else {
+    // otherwise, move the DIV from anywhere inside the DIV:
+    elmnt.onmousedown = dragMouseDown;
+  }
+
+  function dragMouseDown(e) {
+    e = e || window.event;
+    e.preventDefault();
+    // get the mouse cursor position at startup:
+    pos3 = e.clientX;
+    pos4 = e.clientY;
+    document.onmouseup = closeDragElement;
+    // call a function whenever the cursor moves:
+    document.onmousemove = elementDrag;
+  }
+
+  function elementDrag(e) {
+    e = e || window.event;
+    e.preventDefault();
+    // calculate the new cursor position:
+    pos1 = pos3 - e.clientX;
+    pos2 = pos4 - e.clientY;
+    pos3 = e.clientX;
+    pos4 = e.clientY;
+    // set the element's new position:
+    elmnt.style.top = (elmnt.offsetTop - pos2) + "px";
+    elmnt.style.left = (elmnt.offsetLeft - pos1) + "px";
+  }
+
+  function closeDragElement() {
+    // stop moving when mouse button is released:
+    document.onmouseup = null;
+    document.onmousemove = null;
+  }
+}
+</script>
+
+
+<!-- CREATE TREE FUNCTIONS -->
+<script src="RedBlackTree.js"></script>
+<script>
+var t = new RedBlackTree();
+
+function addElement() {
+  var value = document.getElementById('insert').value;
+  t.insert(value);
+  t.ring(value);
+  t.printTree(value);
+}
+
+function deleteElement() {
+  var value = document.getElementById('delete').value;
+  t.deleteNode(value);
+ // t.ring(value);
+  //t.printTree(value);
+}
+
+function findElement() {
+  var value = document.getElementById('search').value;
+  const node = t.search(value);
+  document.getElementById('mydiv').style.visibility = "visible";
+  document.getElementById('mydivbody').innerHTML = '';
+  document.getElementById('mydivbody').innerHTML += '<p>ID : #'+node.id+'</p>';
+  document.getElementById('mydivbody').innerHTML += '<p>DATA : '+node.data+'</p>';
+  document.getElementById('mydivbody').innerHTML += '<p>COLOR : '+node.color+'</p>';
+  document.getElementById('mydivbody').innerHTML += '<p>CHILDREN : '+node.children+'</p>';
+  document.getElementById('mydivbody').innerHTML += '<p>CHILDREN-LEFT : '+node.childrenLeft+'</p>';
+  document.getElementById('mydivbody').innerHTML += '<p>CHILDREN-RIGHT : '+node.childrenRight+'</p>';
+  dragElement(document.getElementById("mydiv"));
+}
+
+function reset() {
+  t.clearCanvas();
+  t = new RedBlackTree();
+  t.clearCanvas();
+}
+
+function resizeTree(){
+	t.shiftTree();
+}
+</script>
+
+</body>
+</html>
