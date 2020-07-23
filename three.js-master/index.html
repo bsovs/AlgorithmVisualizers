@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js webgl - trackball controls</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		
+<style>
+	body {
+		background-color: #ccc;
+		color: #000;
+		overflow:hidden;
+	}
+
+.title{
+	position:absolute;
+	top:10px;
+	left:10px;
+	
+	display:inline-block;
+	top:10px;;
+	font-size:10px;
+	text-align:left;
+	color: #34495e;
+  font-family: monospace;
+  margin: 0 auto; /* Gives that scrolling effect as the typing happens */
+  letter-spacing: .15em; /* Adjust as needed */
+}
+
+.wrapper{
+	position:absolute;
+	top:10px;
+	left:10px;
+	width:100%;
+	height:50px;
+}
+
+		</style>
+	</head>
+
+	<body>
+	<div class="wrapper">
+		<div id="info" class="title typewriter">
+			<h1>MOVE mouse &amp; press LEFT/A: rotate, MIDDLE/S: zoom, RIGHT/D: pan,
+			SPACE: show controls</h1>
+		</div>
+	</div>
+		<script src="src/three.js" type="module"></script>
+		<script type="module">
+
+			import * as THREE from './build/three.module.js';
+
+			import Stats from './examples/jsm/libs/stats.module.js';
+			import { GUI } from './examples/jsm/libs/dat.gui.module.js';
+
+			import { TrackballControls } from './examples/jsm/controls/TrackballControls.js';
+			import { TransformControls } from './examples/jsm/controls/TransformControls.js';
+
+			var control, perspectiveCamera, orthographicCamera, camera, controls, scene, renderer, stats;
+
+			var params = {
+				orthographicCamera: false
+			};
+
+			var frustumSize = 400;
+
+					var projector, mouse = {
+				x: 0,
+				y: 0
+			  },
+			  INTERSECTED;
+
+			init();
+			animate();
+
+			var moveControls, nodes, line, geometry;
+
+			var controlsVisible = false;
+
+			function init() {
+
+				moveControls = [];
+		
+				var aspect = window.innerWidth / window.innerHeight;
+
+				perspectiveCamera = new THREE.PerspectiveCamera( 60, aspect, 1, 1000 );
+				perspectiveCamera.position.z = 500;
+
+				orthographicCamera = new THREE.OrthographicCamera( frustumSize * aspect / - 2, frustumSize * aspect / 2, frustumSize / 2, frustumSize / - 2, 1, 1000 );
+				orthographicCamera.position.z = 500;
+
+				camera = ( params.orthographicCamera ) ? orthographicCamera : perspectiveCamera;
+				
+				// renderer
+
+				renderer = new THREE.WebGLRenderer( { antialias: true } );
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				document.body.appendChild( renderer.domElement );
+				
+				// world
+
+				scene = new THREE.Scene();
+				scene.background = new THREE.Color( 0xcccccc );
+				scene.fog = new THREE.FogExp2( 0xcccccc, 0.0010 );
+
+				var geometry = new THREE.SphereGeometry( 12, 64, 64 );
+				var material = new THREE.MeshPhongMaterial( { color: (52, 73, 94), flatShading: true } );
+				
+				//create a blue LineBasicMaterial
+				var lineMaterial = new THREE.LineBasicMaterial( { color: 0x0000ff } );
+				
+				var points = [];
+				nodes = [];
+		
+				createControls( perspectiveCamera ); //create control system
+		
+				for ( var i = 0; i < 10; i ++ ) {
+					
+					
+					control = new TransformControls( camera, renderer.domElement );
+					control.addEventListener( 'change', render );
+
+					control.addEventListener( 'dragging-changed', function ( event ) {
+
+						controls.enabled = ! event.value;
+
+					} );
+					
+					var mesh = new THREE.Mesh( geometry, material );
+					mesh.position.x = ( Math.random() - 0.5 ) * 250;
+					mesh.position.y = ( Math.random() - 0.5 ) * 250;
+					mesh.position.z = ( Math.random() - 0.5 ) * 200;
+					mesh.updateMatrix();
+					mesh.matrixAutoUpdate = true;
+					mesh.dynamic = true;
+					scene.add( mesh );
+					
+					points.push( new THREE.Vector3( mesh.position.x, mesh.position.y, mesh.position.z ) ); //add line
+					
+					control.attach( mesh );
+					scene.add( control );	
+					control.visible = false;
+					
+					nodes.push(mesh);
+					moveControls.push(control);
+				}
+
+				window.addEventListener( 'keydown', function ( event ) {
+
+					switch ( event.keyCode ) {
+						case 32: // SPACE
+							for(const cont of moveControls){
+								if(controlsVisible){
+									cont.visible = false;
+								}
+								else{
+									cont.visible = true;
+								}
+							}
+							if(controlsVisible){
+									controlsVisible = false;
+							}
+							else{
+								controlsVisible = true;
+							}
+							break;
+					}	
+				} );
+				var indices = [0, 1, 1, 2, 2, 3, 4, 5];
+				//geometry = new THREE.BufferGeometry().setFromPoints( points );
+				var geometry = new THREE.BufferGeometry();
+				geometry.addAttribute('position', new THREE.BufferAttribute(points, 3));
+				geometry.setIndex(new THREE.BufferAttribute(new Uint16Array(indices), 1));
+				line = new THREE.LineSegments( geometry, material );
+				line.dynamic = true;
+				line.geometry.verticesNeedUpdate = true;
+				scene.add( line );
+				
+				// lights
+
+				var light = new THREE.DirectionalLight( 0xffffff );
+				light.position.set( 1, 1, 1 );
+				scene.add( light );
+
+				var light = new THREE.DirectionalLight( 0x002288 );
+				light.position.set( - 1, - 1, - 1 );
+				scene.add( light );
+
+				var light = new THREE.AmbientLight( 0x222222 );
+				scene.add( light );
+
+				
+
+				stats = new Stats();
+				//document.body.appendChild( stats.dom );
+
+				/*
+
+				var gui = new GUI();
+				gui.add( params, 'orthographicCamera' ).name( 'use orthographic' ).onChange( function ( value ) {
+
+					controls.dispose();
+
+					createControls( value ? orthographicCamera : perspectiveCamera );
+
+				} );
+
+				*/
+
+				window.addEventListener( 'resize', onWindowResize, false );
+
+				// when the mouse moves, call the given function
+				document.addEventListener('mousemove', onDocumentMouseMove, false);
+			}
+			
+			function update() {
+				var positions = line.geometry.attributes.position;
+				var index = 0;
+				for(var i=0; i<nodes.length; i++){
+					positions.setX(i, nodes[i].position.x);
+					positions.setY(i, nodes[i].position.y);
+					positions.setZ(i, nodes[i].position.z);
+				}
+				line.updateMatrix();
+				line.geometry.computeBoundingSphere();
+				positions.needsUpdate = true;
+			};
+			
+			function onDocumentMouseMove(event) {
+			  // the following line would stop any other event handler from firing
+			  // (such as the mouse's TrackballControls)
+			  // event.preventDefault();
+
+			  // update the mouse variable
+			  mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+			  mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
+			}
+
+			function createControls( camera ) {
+
+				controls = new TrackballControls( camera, renderer.domElement );
+
+				controls.rotateSpeed = 1.2;
+				controls.zoomSpeed = 1.5;
+				controls.panSpeed = 0.8;
+
+				controls.keys = [ 65, 83, 68 ];
+
+			}
+
+			function onWindowResize() {
+
+				var aspect = window.innerWidth / window.innerHeight;
+
+				perspectiveCamera.aspect = aspect;
+				perspectiveCamera.updateProjectionMatrix();
+
+				orthographicCamera.left = - frustumSize * aspect / 2;
+				orthographicCamera.right = frustumSize * aspect / 2;
+				orthographicCamera.top = frustumSize / 2;
+				orthographicCamera.bottom = - frustumSize / 2;
+				orthographicCamera.updateProjectionMatrix();
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+				controls.handleResize();
+
+			}
+
+			function animate() {
+
+				requestAnimationFrame( animate );
+
+				controls.update();
+
+				stats.update();
+
+				render();
+				
+				update();
+				line.geometry.verticesNeedUpdate = true;
+
+			}
+
+			function render() {
+
+				camera = ( params.orthographicCamera ) ? orthographicCamera : perspectiveCamera;
+
+				renderer.render( scene, camera );
+
+			}
+
+
+		</script>
+
+	</body>
+</html>

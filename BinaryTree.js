@@ -100,7 +100,7 @@ class BinaryTree {
 			if(node.right === null){
 				this.deleted++;
 				document.getElementById(node.id).remove();
-				if(node.parent !== null){
+				if(this.root !== node){
 					if(node.parent.right === node){
 						this.updateChildren(node);
 						if(node.left !== null){
@@ -125,6 +125,8 @@ class BinaryTree {
 						node.left.parent = null;
 					}
 					this.root = node.left;
+					//this.root.x = node.x;
+					node.left = null;
 					if(this.root !== null)
 						this.root.color = "black";
 				}
@@ -142,6 +144,7 @@ class BinaryTree {
 				}
 				if(node.right !== rep){
 					node.right.parent = rep;
+					rep.right = node.right;
 				}
 				node.left = null;
 				node.right = null;
@@ -153,13 +156,21 @@ class BinaryTree {
 				}
 				else{
 					this.root = rep;
+					this.root.children = node.children-1;
+					this.root.childrenRight = node.childrenRight-1;
+					this.root.childrenLeft = node.childrenLeft;
+					this.root.x = node.x;
+					this.root.y = node.y;
 					this.root.left = rep.left;
 					this.root.right = rep.right;
+					document.getElementById(rep.id).style = 'position:absolute;top:'+node.y+'px;left:'+node.x+'px;';
 				}
+				console.log(rep.x +'  '+rep.y);
 				node.parent = null;
 				document.getElementById(node.id).remove();
 				rep.color = "black";
 				//this.deleteNodeHelper(rep.data, rep);
+				
 			}
 		}else{
 			this.deleteNodeHelper(key, node.left);
@@ -255,7 +266,7 @@ class BinaryTree {
 		if(this.root !== null){
 			var x = screenSize().x/2;
 			if(Math.abs(this.root.childrenLeft-this.root.childrenRight) > 3){
-				x = screenSize().x/2+this.root.childrenLeft*30-this.root.childrenRight*30
+				x = screenSize().x/2+this.root.childrenLeft*30-this.root.childrenRight*30;
 			}
 			
 			var r = 30; //radius of circles

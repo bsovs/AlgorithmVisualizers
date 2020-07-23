@@ -1,0 +1,175 @@
+const pickrContainer = document.getElementsByClassName('pickr-container');
+const themeContainer = document.querySelector('.theme-container');
+const themes = [
+    [
+        'classic',
+        {
+            swatches: [
+                'rgba(244, 67, 54, 1)',
+                'rgba(233, 30, 99, 0.95)',
+                'rgba(156, 39, 176, 0.9)',
+                'rgba(103, 58, 183, 0.85)',
+                'rgba(63, 81, 181, 0.8)',
+                'rgba(33, 150, 243, 0.75)',
+                'rgba(3, 169, 244, 0.7)',
+                'rgba(0, 188, 212, 0.7)',
+                'rgba(0, 150, 136, 0.75)',
+                'rgba(76, 175, 80, 0.8)',
+                'rgba(139, 195, 74, 0.85)',
+                'rgba(205, 220, 57, 0.9)',
+                'rgba(255, 235, 59, 0.95)',
+                'rgba(255, 193, 7, 1)'
+            ],
+
+            components: {
+                preview: true,
+                opacity: true,
+                hue: true,
+
+                interaction: {
+                    hex: true,
+                    rgba: true,
+                    hsva: true,
+                    input: true,
+                    clear: true,
+                    save: true
+                }
+            }
+        }
+    ],
+    [
+        'monolith',
+        {
+            swatches: [
+                'rgba(244, 67, 54, 1)',
+                'rgba(233, 30, 99, 0.95)',
+                'rgba(156, 39, 176, 0.9)',
+                'rgba(103, 58, 183, 0.85)',
+                'rgba(63, 81, 181, 0.8)',
+                'rgba(33, 150, 243, 0.75)',
+                'rgba(3, 169, 244, 0.7)'
+            ],
+
+            defaultRepresentation: 'HEXA',
+            components: {
+                preview: true,
+                opacity: true,
+                hue: true,
+
+                interaction: {
+                    hex: false,
+                    rgba: false,
+                    hsva: false,
+                    input: true,
+                    clear: true,
+                    save: true
+                }
+            }
+        }
+    ],
+    [
+        'nano',
+        {
+            swatches: [
+                'rgba(244, 67, 54, 1)',
+                'rgba(233, 30, 99, 0.95)',
+                'rgba(156, 39, 176, 0.9)',
+                'rgba(103, 58, 183, 0.85)',
+                'rgba(63, 81, 181, 0.8)',
+                'rgba(33, 150, 243, 0.75)',
+                'rgba(3, 169, 244, 0.7)'
+            ],
+
+            defaultRepresentation: 'HEXA',
+            components: {
+                preview: true,
+                opacity: true,
+                hue: true,
+
+                interaction: {
+                    hex: false,
+                    rgba: false,
+                    hsva: false,
+                    input: true,
+                    clear: true,
+                    save: true
+                }
+            }
+        }
+    ]
+];
+
+var buttons = [];
+let pickr = null, pickr2 = null;
+
+for (const [theme, config] of themes) {
+    const button = document.createElement('button');
+    button.innerHTML = theme;
+    buttons.push(button);
+
+    button.addEventListener('click', () => {
+        const el = document.createElement('p');
+        pickrContainer[0].appendChild(el);
+
+        // Delete previous instance
+        if (pickr) {
+            pickr.destroyAndRemove();
+		}
+
+        // Apply active class
+        for (const btn of buttons) {
+            btn.classList[btn === button ? 'add' : 'remove']('active');
+			btn.classList['add']('btn');
+			btn.classList['add']('btn-primary');
+			btn.classList['add']('a-btn-slide-text');
+        }
+
+        // Create fresh instance
+        pickr = new Pickr(Object.assign({
+            el, theme,
+            default: '#2c7bc9'
+        }, config));
+    });
+
+    themeContainer.appendChild(button);
+	
+}
+
+buttons[0].click();
+
+buttons = [];
+
+for (const [theme, config] of themes) {
+    const button = document.createElement('button');
+    button.innerHTML = theme;
+    buttons.push(button);
+
+    button.addEventListener('click', () => {
+        const el = document.createElement('p');
+        pickrContainer[1].appendChild(el);
+
+        // Delete previous instance
+        if (pickr2) {
+            pickr2.destroyAndRemove();
+        }
+
+        // Apply active class
+        for (const btn of buttons) {
+            btn.classList[btn === button ? 'add' : 'remove']('active');
+			btn.classList['add']('btn');
+			btn.classList['add']('btn-primary');
+			btn.classList['add']('a-btn-slide-text');
+        }
+
+        // Create fresh instance
+        pickr2 = new Pickr(Object.assign({
+            el, theme,
+            default: '#179c6d'
+        }, config));
+    });
+
+    themeContainer.appendChild(button);
+	
+}
+
+buttons[0].click();

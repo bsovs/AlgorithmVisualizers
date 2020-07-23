@@ -1,0 +1,239 @@
+	body {
+		background-color:#34495e !important;
+		overflow:hidden;
+		display:inline-block;
+	}
+
+.text-label {
+	top:10px;
+	font-size:15px;
+	text-align:center;
+	color: white;
+  font-family: monospace;
+  margin: 0 auto; /* Gives that scrolling effect as the typing happens */
+  letter-spacing: .15em; /* Adjust as needed */
+}
+
+
+button.btn:hover {
+     -webkit-transform: scale(1.1);
+     -moz-transform: scale(1.1);
+     -o-transform: scale(1.1);
+ }
+ button.btn {
+	position:relative;
+     -webkit-transform: scale(0.8);
+     -moz-transform: scale(0.8);
+     -o-transform: scale(0.8);
+     -webkit-transition-duration: 0.5s;
+     -moz-transition-duration: 0.5s;
+     -o-transition-duration: 0.5s;
+ }
+
+.btn-wrap{
+	position:relative;
+	width:100px;
+	display: normal;
+}
+
+.ico{
+	
+}
+
+.head{
+	position:absolute;
+	z-index:2;
+	display: inline-block;
+	width:100%;
+	top:0px;
+	left:0px;
+	background-color:#34495e;
+	background: linear-gradient(to bottom, #24384d 0%, #34495e 100%);
+	padding-bottom:20px;
+}
+
+.container{
+	display: inline-block !important;
+	color:white;
+	font-family: 'Helvetica Neue', sans-serif; 
+	height: 100px;
+}
+
+.title { 
+	display: inline-block;
+	position:relative;
+	margin-top:20px;
+	margin-left:20px !important;
+	color: white; 
+	font-family: 'Helvetica Neue', sans-serif; 
+	font-size: 25px; 
+	font-weight: bold; 
+	letter-spacing: -1px; 
+	line-height: 1; 
+}
+
+.inputs{
+	display: inline-block;
+	margin-left:20px !important;
+	position:relative;
+	max-width:900px;
+	width:100%;
+	margin-top:20px;
+}
+
+.input{
+	display: inline-block;
+	
+	text-align:center;
+	font-style: italic;
+	padding: 0px 0px 0px 0px;
+	background: transparent;
+	outline: none;
+	border: none;
+	border-bottom: 1px dashed #83A4C5;
+	overflow: hidden;
+	resize:none;
+	height:20px;
+	color: white;
+}
+
+#addNode{
+	position:relative;
+	margin-top:100px;
+	width: 100%;
+	font-family: 'Helvetica Neue', sans-serif; 
+	font-size: 25px; 
+	font-weight: bold; 
+	letter-spacing: -1px; 
+	text-align: center;
+}
+
+#mydiv {
+  position: absolute;
+  z-index: 9;
+	margin-left:50px;
+	margin-top:200px;
+	font-family: 'Helvetica Neue', sans-serif; 
+	font-size: 17px; 
+	font-weight: bold; 
+  text-align: center;
+
+}
+
+#mydivheader {
+cursor: move;
+ z-index: 9;
+  padding: 10px;
+  z-index: 10;
+  background-color:#dedede;
+  color: black;
+ -webkit-box-shadow:0 1px 4px rgba(0, 0, 0, 0.3), 0 0 40px rgba(0, 0, 0, 0.1) inset;
+       -moz-box-shadow:0 1px 4px rgba(0, 0, 0, 0.3), 0 0 40px rgba(0, 0, 0, 0.1) inset;
+            box-shadow:0 1px 4px rgba(0, 0, 0, 0.3), 0 0 40px rgba(0, 0, 0, 0.1) inset;
+}
+
+#mydivbody{
+	z-index: 9;
+	font-size: 14px; 
+	background-color: transparent;
+	padding-top:10px;
+	margin-bottom:0px;
+	height:100%;
+	width:100%;
+}
+
+.add{
+	color:black;
+}
+
+#tree{
+	padding-top:50px;
+	z-index:-1;
+	position:absolute;
+	left:0px;
+	top:0px;
+	width:100%;
+	height:100%;
+}
+#branch{
+	padding-top:50px;
+	z-index:-2;
+	position:absolute;
+	left:0px;
+	top:0px;
+	width:100%;
+	height:100%;
+}
+
+/* Dropdown Button */
+.dropbtn {
+  background-color:transparent !important;
+  text-decoration:none;
+  color: white;
+  padding: 16px;
+  font-size: 16px;
+  border: none;
+}
+
+/* The container <div> - needed to position the dropdown content */
+.dropdown {
+  position: relative;
+  display: inline-block;
+}
+
+/* Dropdown Content (Hidden by Default) */
+.dropdown-content {
+  display: none;
+  position: absolute;
+  background-color: #f1f1f1;
+  min-width: 160px;
+  box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+  z-index: 1;
+  width:100%;
+}
+
+.wrapper{
+		position:absolute;
+		bottom:0px;
+		left:10px;
+}
+
+.control-text{
+	text-decoration:none;
+  color: white;
+  text-decoration: none;
+  display: block;
+  font-size: 5px !important;
+}
+
+/* Links inside the dropdown */
+.dropdown-content a {
+text-decoration:none;
+  color: black;
+  padding: 12px 16px;
+  text-decoration: none;
+  display: block;
+  font-size: 14px;
+}
+
+/* Change color of dropdown links on hover */
+.dropdown-content a:hover {
+	text-decoration:none !important;
+	color:#44484f;
+}
+
+/* Show the dropdown menu on hover */
+.dropdown:hover .dropdown-content {
+	display: block;
+	text-decoration:none !important;
+	}
+
+/* Change the background color of the dropdown button when the dropdown content is shown */
+.dropdown:hover .dropbtn {background-color:#34495e;}
+
+
+.pickr{
+	display:inline;
+	width:0px;
+
+}

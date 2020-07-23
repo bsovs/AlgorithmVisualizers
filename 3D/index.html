@@ -1,0 +1,927 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>3D Graph Visualizer</title>
+		<meta name="description" content="Build an interactive 3D graph.">
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		
+		<!--style sheet-->
+	<link rel="stylesheet" href="./3D.css">
+		
+	<!-- BOOTSTRAP -->
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+	  	
+	</head>
+
+<body>
+
+	<div class="wrapper">
+		<div id="info" class="control-text">
+			<h4>MOVE mouse &amp; press LEFT/A: rotate, MIDDLE/S: zoom, RIGHT/D: pan,
+			SPACE: show controls</h4>
+		</div>
+	</div>
+	
+	<!-- BUTTONS START -->
+<div class="head">
+	<div class="dropdown title">
+		<button class="dropbtn">
+		<span class="glyphicon glyphicon-menu-right " aria-hidden="true"></span>
+		3D GRAPH VISUALIZER.
+		</button>
+		<div class="dropdown-content">
+			<a href="../"><span class="glyphicon glyphicon-menu-right " aria-hidden="true"></span> HOME</a>
+			<a href="../BinaryTree.html"><span class="glyphicon glyphicon-menu-right " aria-hidden="true"></span> BINARY TREE VISUALIZER</a>
+			<a href="../RedBlackTree.html"><span class="glyphicon glyphicon-menu-right " aria-hidden="true"></span> REDBLACK TREE VISUALIZER</a>
+			<a href="#"><span class="glyphicon glyphicon-menu-right " aria-hidden="true"></span> COMING SOON...</a>
+		</div>
+	</div>
+
+	<div class="row inputs">
+	&nbsp;
+	<span class="btn-wrap">
+	<button class="btn btn-primary a-btn-slide-text" onclick="addPopup()" id="addButton">
+        <span class="glyphicon glyphicon-plus ico" aria-hidden="true"></span>
+        <span class="ico"><strong>Add</strong></span>  
+			</button>
+	</span>
+	&nbsp;&nbsp;
+	<input type="text" class="input" id="delete" value="" placeholder="Delete Value">
+	
+	<span class="btn-wrap">
+    <button class="btn btn-primary a-btn-slide-text" onclick="deleteElement()" id="deleteButton">
+       <span class="glyphicon glyphicon-trash ico" aria-hidden="true"></span>
+        <span><strong>Delete</strong></span> 
+		</button>
+</span>		
+	&nbsp;&nbsp;
+	<input type="text" class="input" id="search" value="" placeholder="Search Value">
+	
+	<span class="btn-wrap">
+	<button class="btn btn-primary a-btn-slide-text" onclick="search()" id="searchButton">
+        <span class="glyphicon glyphicon-eye-open ico" aria-hidden="true"></span>
+        <span><strong>Search</strong></span> 
+		</button>
+</span>		
+	&nbsp;
+	<span class="btn-wrap">
+	<button class="btn btn-primary a-btn-slide-text" onclick="reset()" id="reset">
+        <span class="glyphicon glyphicon-repeat ico" aria-hidden="true"></span>
+        <span><strong>Reset</strong></span> 
+</button>		
+	</span>	
+
+&nbsp;
+	<span style="display:inline;">
+<span class="theme-container" style="position:absolute;visibility:hidden;width:250px;display:inline"></span>
+<span class="pickr-container pickr" style="position:relative;width:50px;display:inline"></span>
+</span>	
+
+&nbsp;
+	<span style="display:inline;">
+<span class="pickr-container pickr" style="position:relative;width:50px;display:inline"></span>
+</span>	
+	
+</div>
+</div>
+<!-- BUTTONS END -->
+
+
+<!------------- Draggable DIV ------------->
+<div id="mydiv" class="dropdown" style="visibility:hidden;">
+  <div id="mydivheader">ADD NODE
+  <div id="mydivbody">
+	<input type="text" class="input add" id="name" value="" placeholder="Name/Data">
+	<br>
+	<input type="text" class="input group add" value="" placeholder="Group/Type">
+	<br>
+	<input type="text" class="input group add" value="" placeholder="Group/Type">
+	<br>
+	<input type="text" class="input group add" value="" placeholder="Group/Type">
+	<br>
+	<span class="btn-wrap">
+	<button class="btn btn-primary a-btn-slide-text" onclick="addElement()" id="add">
+        <span class="glyphicon glyphicon-plus ico" aria-hidden="true"></span>
+        <span class="ico"><strong>Add</strong></span>  
+			</button>
+	</span>
+	</div>
+ </div>
+</div>
+<script>
+document.getElementById('mydiv').style.visibility = "hidden";
+
+var dragItem = document.querySelector("#mydivheader");
+    var container = document.querySelector("#mydiv");
+
+    var active = false;
+    var currentX;
+    var currentY;
+    var initialX;
+    var initialY;
+    var xOffset = 0;
+    var yOffset = 0;
+
+    container.addEventListener("touchstart", dragStart, false);
+    container.addEventListener("touchend", dragEnd, false);
+    container.addEventListener("touchmove", drag, false);
+
+    container.addEventListener("mousedown", dragStart, false);
+    container.addEventListener("mouseup", dragEnd, false);
+    container.addEventListener("mousemove", drag, false);
+
+    function dragStart(e) {
+      if (e.type === "touchstart") {
+        initialX = e.touches[0].clientX - xOffset;
+        initialY = e.touches[0].clientY - yOffset;
+      } else {
+        initialX = e.clientX - xOffset;
+        initialY = e.clientY - yOffset;
+      }
+
+      if (e.target === dragItem) {
+        active = true;
+      }
+    }
+
+    function dragEnd(e) {
+      initialX = currentX;
+      initialY = currentY;
+
+      active = false;
+    }
+
+    function drag(e) {
+      if (active) {
+      
+        e.preventDefault();
+      
+        if (e.type === "touchmove") {
+          currentX = e.touches[0].clientX - initialX;
+          currentY = e.touches[0].clientY - initialY;
+        } else {
+          currentX = e.clientX - initialX;
+          currentY = e.clientY - initialY;
+        }
+
+        xOffset = currentX;
+        yOffset = currentY;
+
+        setTranslate(currentX, currentY, dragItem);
+      }
+    }
+
+    function setTranslate(xPos, yPos, el) {
+      el.style.transform = "translate3d(" + xPos + "px, " + yPos + "px, 0)";
+    }
+</script>
+
+
+		<script src="src/three.js" type="module"></script>
+		<script type="module">
+
+			class Node {
+
+			  constructor(nameData, groupData) {
+				this.data = nameData;
+				this.group = groupData;
+				this.edges = 0;
+				this.id = 0;
+				this.pos = {x:0,y:0,z:0};
+			  }
+
+			}
+
+			class Graph {
+
+			  constructor(graphData) {
+				this.node = [];
+				this.size = 0;
+				if(Array.isArray(graphData))
+					this.insert(graphData);
+			  }
+
+				insert(graphData) {
+				console.log(graphData);
+					if(Array.isArray(graphData)){
+						for(var {name:nameData, group:groupData} of graphData){
+							var newNode = new Node(nameData, groupData);
+							this.node.push(newNode);
+							this.size++;
+						}	
+					}					
+				}
+				
+				deleteNode(data){
+					for(var i=0; i<this.node.length; i++){
+						console.log(this.node[i].data+'  '+data);
+						if(this.node[i].data === data){
+							disposeNode(nodes[i]);
+							disposeNode(moveControls[i]);
+							this.node.splice(i,1);
+							for(var j=0; j<indices.length; j++){
+								if(indices[j] == i){
+									if(j%2==0){
+										indices.splice(j,2);
+										j--;
+									}
+									else{
+										indices.splice(j-1,2);
+										j-=2;
+									}
+								}
+								else if(indices[j]>i)
+									indices[j]--;
+								console.log(indices);
+							}
+							nodes.splice(i,1);
+							moveControls.splice(i,1);
+							points.splice(i,1);
+							this.size--;
+							i--;
+						}
+					}
+				}
+				
+				search(data){
+					for(var i=0; i<this.node.length; i++){
+						if(this.node[i].data === data){
+							var node = this.node[i];
+							document.getElementById('mydiv').style.visibility = "visible";
+							document.getElementById('mydivbody').style.color = "black";
+							document.getElementById('mydivbody').innerHTML = '';
+							document.getElementById('mydivbody').innerHTML += '<p>ID : #'+node.id+'</p>';
+							document.getElementById('mydivbody').innerHTML += '<p>DATA : '+node.data+'</p>';
+							document.getElementById('mydivbody').innerHTML += '<p>GROUP : '+node.group+'</p>';
+							document.getElementById('mydivbody').innerHTML += '<p>EDGES : '+node.edges+'</p>';	
+						}
+						console.log(this.node[i].data+'  '+this.node[i].edges);
+					}
+				}
+				
+			}
+			
+			var graph = new Graph(); //init graph
+			
+			function isEmptyOrSpaces(str){
+				return str === null || str.match(/^ *$/) !== null;
+				}
+			
+			document.getElementById("addButton").onclick = function addPopup(){
+	document.getElementById('mydiv').style.visibility = "visible";
+	document.getElementById('mydivheader').innerHTML = 'ADD NODE' +
+    '<div id="mydivbody">'+
+	'<input type="text" class="input add" id="name" value="" placeholder="Name/Data">'+
+	'<br>'+
+	'<input type="text" class="input group add" value="" placeholder="Group/Type">'+
+	'<br>'+
+	'<input type="text" class="input group add" value="" placeholder="Group/Type"><br>'+
+	'<input type="text" class="input group add" value="" placeholder="Group/Type">'+
+	'<br><span class="btn-wrap"><button class="btn btn-primary a-btn-slide-text" onclick="addElement()" id="add">'+
+	'<span class="glyphicon glyphicon-plus ico" aria-hidden="true"></span><span class="ico"><strong>Add</strong></span>'+
+	'</button></span></div>';
+	document.getElementById("add").onclick = function addElement(data){
+				var inputs = document.getElementsByClassName('group'),
+					names  = [].map.call(inputs, function( input ) {
+						return input.value;
+					});
+					names = names.filter(function(value, index, arr){ return !isEmptyOrSpaces(value);});
+				var value = [{name:document.getElementById('name').value, group:names}];
+				graph.insert(eval(value)); //insert node
+				update();
+				document.getElementById('mydiv').style.visibility = "hidden";
+			}	
+}
+			
+			//insert a node
+			document.getElementById("add").onclick = function addElement(data){
+				var inputs = document.getElementsByClassName('group'),
+					names  = [].map.call(inputs, function( input ) {
+						return input.value;
+					});
+					names = names.filter(function(value, index, arr){ return !isEmptyOrSpaces(value);});
+				var value = [{name:document.getElementById('name').value, group:names}];
+				graph.insert(eval(value)); //insert node
+				update();
+				document.getElementById('mydiv').style.visibility = "hidden";
+			}	
+			
+			//delete a node
+			document.getElementById("deleteButton").onclick = function deleteElement(){
+				var data = document.getElementById('delete').value;
+				graph.deleteNode(data);
+				
+				scene.remove( line );
+				geometry = new THREE.BufferGeometry().setFromPoints( points );
+				linegeometry = geometry;
+				geometry.setIndex(new THREE.BufferAttribute(new Uint16Array(indices), 1));
+				line = new THREE.LineSegments( geometry, lineMaterial );
+				line.dynamic = true;
+				line.geometry.verticesNeedUpdate = true;
+				scene.add( line );
+				
+				console.log('renderer.info.memory after: ', renderer.info);		
+			}
+			
+			//find a node
+			document.getElementById("searchButton").onclick = function search(){
+				var data = document.getElementById('search').value;
+				graph.search(data);	
+			}
+			
+			//reset the graph
+			document.getElementById("reset").onclick = function reset(){
+				graph = new Graph();
+				
+				disposeHierchy(scene, disposeNode);
+				console.log('renderer.info.memory after: ', renderer.info);
+				
+			}	
+			
+	
+	function disposeNode(node) {
+    if (node instanceof THREE.Mesh) {
+	  
+	  for (var i = node.children.length - 1; i >= 0; i--) {
+			node.remove(node.children[i]);
+		}
+	  
+	  if (node.geometry) {
+        node.geometry.dispose();
+        node.geometry = undefined; // fixed problem
+		scene.remove( node );
+      }
+
+      if (node.material) {
+        if (node.material instanceof THREE.MeshFaceMaterial || node.material instanceof THREE.MultiMaterial) {
+          node.material.materials.forEach( function(mtrl, idx) {
+            if (mtrl.map) mtrl.map.dispose();
+            if (mtrl.lightMap) mtrl.lightMap.dispose();
+            if (mtrl.bumpMap) mtrl.bumpMap.dispose();
+            if (mtrl.normalMap) mtrl.normalMap.dispose();
+            if (mtrl.specularMap) mtrl.specularMap.dispose();
+            if (mtrl.envMap) mtrl.envMap.dispose();
+
+            mtrl.dispose();
+            mrtl = undefined; // fixed problem
+          } );
+        }
+        else {
+          if (node.material.map) node.material.map.dispose();
+          if (node.material.lightMap) node.material.lightMap.dispose();
+          if (node.material.bumpMap) node.material.bumpMap.dispose();
+          if (node.material.normalMap) node.material.normalMap.dispose();
+          if (node.material.specularMap) node.material.specularMap.dispose();
+          if (node.material.envMap) node.material.envMap.dispose();
+			
+			
+          node.material.dispose();
+          node.material = undefined; // fixed problem
+        }
+		}
+		
+    }
+	if (node instanceof TransformControls) {
+        node.dispose();
+        node.TransformControls = undefined; // fixed problem
+		scene.remove( node );
+      }
+   // renderer.dispose(); // ***EDIT*** improved even memory more original scene heap is 12.4 MB; add objects increases to 116 MB or 250 MB (different models), clearing always brings down to 13.3 MB ... there still might be some artifacts.  
+    node = undefined; // unnecessary
+  }
+
+  function disposeHierchy(node, callback) {
+    for (var i = node.children.length - 1; i >= 0; i--) {
+      var child = node.children[i];
+
+      disposeHierchy(child, callback);
+      callback(child);
+    }
+	scene.remove( line );
+	
+	indices = [];
+	points = [];
+	nodes = [];
+	
+	geometry = new THREE.BufferGeometry().setFromPoints( points );
+				linegeometry = geometry;
+				//geometry = new THREE.BufferGeometry();
+				//geometry.addAttribute('position', new THREE.BufferAttribute(points, 3));
+				geometry.setIndex(new THREE.BufferAttribute(new Uint16Array(indices), 1));
+				line = new THREE.LineSegments( geometry, lineMaterial );
+				line.dynamic = true;
+				line.geometry.verticesNeedUpdate = true;
+				scene.add( line );
+  }
+  
+  
+			
+			graph.insert([{name:'Geralt',group:['Rivea','Witcher','Badass']},{name:'Jon Snow',group:['GoT','Winterfell','Stark']}]);
+			graph.insert([{name:'Sansa',group:['GoT','Winterfell','Stark']}]);
+			graph.insert([{name:'Arya',group:['GoT','Winterfell','Stark']}]);
+			graph.insert([{name:'Gendry',group:['Kings Landing','Arya', 'Baratheon']}]);
+			graph.insert([{name:'Ciri',group:['Witcher', 'Geralt']}]);
+
+
+
+
+
+			import * as THREE from './build/three.module.js';
+
+			import Stats from './examples/jsm/libs/stats.module.js';
+			import { GUI } from './examples/jsm/libs/dat.gui.module.js';
+
+			import { TrackballControls } from './examples/jsm/controls/TrackballControls.js';
+			import { TransformControls } from './examples/jsm/controls/TransformControls.js';
+			import { CSS2DRenderer, CSS2DObject } from './examples/jsm/renderers/CSS2DRenderer.js';
+
+			var control, perspectiveCamera, orthographicCamera, camera, controls, scene, renderer, labelRenderer, stats;
+
+			var params = {
+				orthographicCamera: false
+			};
+
+			var frustumSize = 400;
+
+					var projector, mouse = {
+				x: 0,
+				y: 0
+			  },
+			  INTERSECTED;
+
+			var linegeometry;
+
+			init();
+			animate();
+
+			var moveControls, nodes, line, points, geometry, material, lineMaterial;
+			var indices;
+			var controlsVisible = false;
+
+			function init() {
+				
+				moveControls = [];
+				indices = [];
+		
+				var aspect = window.innerWidth / window.innerHeight;
+
+				perspectiveCamera = new THREE.PerspectiveCamera( 60, aspect, 1, 10000 );
+				perspectiveCamera.position.z = 500;
+
+				orthographicCamera = new THREE.OrthographicCamera( frustumSize * aspect / - 2, frustumSize * aspect / 2, frustumSize / 2, frustumSize / - 2, 1, 1000 );
+				orthographicCamera.position.z = 500;
+
+				camera = ( params.orthographicCamera ) ? orthographicCamera : perspectiveCamera;
+				
+				// renderer
+
+				renderer = new THREE.WebGLRenderer( { antialias: true } );
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.domElement.style.top = 0;
+				document.body.appendChild( renderer.domElement );
+				
+				// world
+
+				scene = new THREE.Scene();
+				scene.background = new THREE.Color( 0x34495e );
+				
+				//background
+				/*const loader = new THREE.CubeTextureLoader();
+				const texture = loader.load([
+      'https://threejsfundamentals.org/threejs/resources/images/cubemaps/computer-history-museum/pos-x.jpg',
+      'https://threejsfundamentals.org/threejs/resources/images/cubemaps/computer-history-museum/neg-x.jpg',
+      'https://threejsfundamentals.org/threejs/resources/images/cubemaps/computer-history-museum/pos-y.jpg',
+      'https://threejsfundamentals.org/threejs/resources/images/cubemaps/computer-history-museum/neg-y.jpg',
+      'https://threejsfundamentals.org/threejs/resources/images/cubemaps/computer-history-museum/pos-z.jpg',
+      'https://threejsfundamentals.org/threejs/resources/images/cubemaps/computer-history-museum/neg-z.jpg',
+    ]);
+    scene.background = texture;*/
+				
+				scene.fog = new THREE.FogExp2( 0xcccccc, 0.000006 );  //scene fog
+
+				geometry = new THREE.SphereGeometry( 12, 64, 64 );
+				material = new THREE.MeshPhongMaterial( { color: (52, 73, 94), flatShading: true } );
+				
+				//create a blue LineBasicMaterial
+				lineMaterial = new THREE.LineBasicMaterial( { color: 0x0000ff } );
+				
+				points = [];
+				nodes = [];
+		
+				//labels
+				labelRenderer = new CSS2DRenderer();
+				labelRenderer.setSize( window.innerWidth, window.innerHeight );
+				labelRenderer.domElement.style.position = 'absolute';
+				labelRenderer.domElement.style.top = 0;
+	
+				document.body.appendChild( labelRenderer.domElement );
+				
+				createControls( perspectiveCamera ); //create control system
+		
+				for ( var i = 0; i < graph.size; i++ ) {
+					
+					
+					control = new TransformControls( camera, labelRenderer.domElement );
+					control.addEventListener( 'change', render );
+
+					control.addEventListener( 'dragging-changed', function ( event ) {
+
+						controls.enabled = ! event.value;
+
+					} );
+					
+					var mesh = new THREE.Mesh( geometry, material );
+					mesh.position.x = ( Math.random() - 0.7 ) * 300;
+					mesh.position.y = ( Math.random() - 0.5 ) * 200;
+					mesh.position.z = ( Math.random() - 0.5 ) * 100;
+					mesh.updateMatrix();
+					mesh.matrixAutoUpdate = true;
+					mesh.dynamic = true;
+					scene.add( mesh );
+					
+					//label
+					var meshDiv = document.createElement( 'div' );
+					meshDiv.className = 'text-label';
+					meshDiv.textContent = graph.node[i].data;
+					meshDiv.style.marginTop = '-1em';
+					var meshLabel = new CSS2DObject( meshDiv );
+					meshLabel.position.set( 0, 15, 0 );
+					mesh.add( meshLabel );
+					
+					points.push( new THREE.Vector3( mesh.position.x, mesh.position.y, mesh.position.z ) ); //add line
+					
+					for(var j=0; j<graph.size; j++){
+						if((graph.node[i].group.filter(value => graph.node[j].group.includes(value)).length > 0) && i!=j){ //overlap
+							indices.push(i);//add line connection
+							indices.push(j);
+							graph.node[i].edges++;
+						}
+						else if((graph.node[i].group.includes(graph.node[j].data)) && i!=j){
+							indices.push(i);//add line connection
+							indices.push(j);
+							graph.node[i].edges++;
+							graph.node[j].edges++;
+						}
+					}
+					
+					control.attach( mesh );
+					scene.add( control );	
+					control.visible = false;
+					
+					nodes.push(mesh);
+					moveControls.push(control);
+				}
+
+				window.addEventListener( 'keydown', function ( event ) {
+
+					switch ( event.keyCode ) {
+						case 32: // SPACE
+							for(const cont of moveControls){
+								if(controlsVisible){
+									cont.visible = false;
+								}
+								else{
+									cont.visible = true;
+								}
+							}
+							if(controlsVisible){
+									controlsVisible = false;
+							}
+							else{
+								controlsVisible = true;
+							}
+							break;
+					}	
+				} );
+				
+				geometry = new THREE.BufferGeometry().setFromPoints( points );
+				linegeometry = geometry;
+				//geometry = new THREE.BufferGeometry();
+				//geometry.addAttribute('position', new THREE.BufferAttribute(points, 3));
+				geometry.setIndex(new THREE.BufferAttribute(new Uint16Array(indices), 1));
+				line = new THREE.LineSegments( geometry, lineMaterial );
+				line.dynamic = true;
+				line.geometry.verticesNeedUpdate = true;
+				scene.add( line );
+				
+				// lights
+
+				var light = new THREE.DirectionalLight( 0xffffff );
+				light.position.set( 1, 1, 1 );
+				scene.add( light );
+				
+				var light = new THREE.DirectionalLight( 0xffffff );
+				light.position.set( - 1, -1, - 1 );
+				scene.add( light );
+				
+				var light = new THREE.DirectionalLight( 0xffffff );
+				light.position.set( 0, 0, 0 );
+				scene.add( light );
+/*
+				var light = new THREE.DirectionalLight( 0x002288 );
+				light.position.set( - 1, - 1, - 1 );
+				scene.add( light );
+				
+				var light = new THREE.DirectionalLight( 0xffffff );
+				light.position.set( - 1, 0, - 1 );
+				scene.add( light );
+				
+				var light = new THREE.AmbientLight( 0x222222 );
+				scene.add( light );
+*/
+				stats = new Stats();
+
+				window.addEventListener( 'resize', onWindowResize, false );
+
+				// when the mouse moves, call the given function
+				document.addEventListener('mousemove', onDocumentMouseMove, false);
+				
+				console.log(scene.children);
+			}
+			
+			function update(){
+					
+					var i = graph.size-1;
+					
+					geometry = new THREE.SphereGeometry( 12, 64, 64 );
+					material = new THREE.MeshPhongMaterial( { color: (52, 73, 94), flatShading: true } );
+				
+					
+					control = new TransformControls( camera, labelRenderer.domElement );
+					control.addEventListener( 'change', render );
+
+					control.addEventListener( 'dragging-changed', function ( event ) {
+
+						controls.enabled = ! event.value;
+
+					} );
+					
+					var mesh = new THREE.Mesh( geometry, material );
+					mesh.position.x = ( Math.random() - 0.7 ) * 300;
+					mesh.position.y = ( Math.random() - 0.5 ) * 200;
+					mesh.position.z = ( Math.random() - 0.5 ) * 100;
+					mesh.updateMatrix();
+					mesh.matrixAutoUpdate = true;
+					mesh.dynamic = true;
+					scene.add( mesh );
+					
+					//label
+					var meshDiv = document.createElement( 'div' );
+					meshDiv.className = 'text-label';
+					meshDiv.textContent = graph.node[i].data;
+					meshDiv.style.marginTop = '-1em';
+					var meshLabel = new CSS2DObject( meshDiv );
+					meshLabel.position.set( 0, 15, 0 );
+					mesh.add( meshLabel );
+					
+					points.push( new THREE.Vector3( mesh.position.x, mesh.position.y, mesh.position.z ) ); //add line
+					
+					var links = 0;
+					var oglinks = indices.length;
+					
+					for(var j=0; j<graph.size-1; j++){
+					
+						if((graph.node[i].group.filter(value => graph.node[j].group.includes(value)).length > 0) && i!=j){ //overlap
+							indices.push(i);//add line connection
+							indices.push(j);
+							graph.node[i].edges++;
+							graph.node[j].edges++;
+							links+=2;
+						}
+						else if((graph.node[i].group.includes(graph.node[j].data)) && i!=j){
+							indices.push(i);//add line connection
+							indices.push(j);
+							graph.node[i].edges++;
+							graph.node[j].edges++;
+							links+=2;
+						}
+					}
+					
+					control.attach( mesh );
+					scene.add( control );	
+					control.visible = false;
+					
+					nodes.push(mesh);
+					moveControls.push(control);
+					
+					//geometry = linegeometry;
+					line.geometry.setFromPoints( points );
+					//geometry = new THREE.BufferGeometry();
+					//line.geometry.addAttribute('position', new THREE.BufferAttribute(points[i], 3));
+					line.geometry.addIndex(new THREE.BufferAttribute(new Uint16Array(indices), 1));
+					//line.add(new THREE.LineSegments( geometry, lineMaterial ));
+					line.dynamic = true;
+					line.geometry.verticesNeedUpdate = true;
+					//scene.add(line);
+					
+					updateLine();
+					mesh.needsUpdate = true;
+					scene.needsUpdate = true;
+			}
+			
+			function updateLine() {
+				var positions = line.geometry.attributes.position;
+				var index = 0;
+				for(var i=0; i<nodes.length; i++){
+					positions.setX(i, nodes[i].position.x);
+					positions.setY(i, nodes[i].position.y);
+					positions.setZ(i, nodes[i].position.z);
+				}
+				line.updateMatrix();
+				line.geometry.computeBoundingSphere();
+				positions.needsUpdate = true;
+			};
+			
+			function onDocumentMouseMove(event) {
+			  // the following line would stop any other event handler from firing
+			  // (such as the mouse's TrackballControls)
+			  // event.preventDefault();
+
+			  // update the mouse variable
+			  mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+			  mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
+			}
+
+			function createControls( camera ) {
+
+				controls = new TrackballControls( camera, labelRenderer.domElement );
+				
+				controls.target.set(0, 0, 0);
+				controls.update();
+				
+				controls.rotateSpeed = 1.2;
+				controls.zoomSpeed = 1.5;
+				controls.panSpeed = 0.8;
+
+				controls.keys = [ 65, 83, 68 ];
+
+			}
+
+			function onWindowResize() {
+
+				var aspect = window.innerWidth / window.innerHeight;
+
+				perspectiveCamera.aspect = aspect;
+				perspectiveCamera.updateProjectionMatrix();
+
+				orthographicCamera.left = - frustumSize * aspect / 2;
+				orthographicCamera.right = frustumSize * aspect / 2;
+				orthographicCamera.top = frustumSize / 2;
+				orthographicCamera.bottom = - frustumSize / 2;
+				orthographicCamera.updateProjectionMatrix();
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+				controls.handleResize();
+
+			}
+
+			function animate() {
+
+				requestAnimationFrame( animate );
+
+				controls.update();
+
+				stats.update();
+
+				render();
+				
+				updateLine();
+				
+				color();
+				
+				line.geometry.verticesNeedUpdate = true;
+
+			}
+			
+			function color(){
+				const col = document.getElementsByClassName("pcr-button")[0].style.color;
+				material.color.set(col);
+				const col2 = document.getElementsByClassName("pcr-button")[1].style.color;
+				lineMaterial.color.set(col2);
+			}
+
+			function resizeRendererToDisplaySize(renderer) {
+				const canvas = renderer.domElement;
+				const width = canvas.clientWidth;
+				const height = canvas.clientHeight;
+				const needResize = canvas.width !== width || canvas.height !== height;
+				if (needResize) {
+				  renderer.setSize(width, height, false);
+				}
+				return needResize;
+			  }
+
+			function render() {
+
+				camera = ( params.orthographicCamera ) ? orthographicCamera : perspectiveCamera;
+
+				 if (resizeRendererToDisplaySize(renderer)) {
+				  const canvas = renderer.domElement;
+				  camera.aspect = canvas.clientWidth / canvas.clientHeight;
+				  camera.updateProjectionMatrix();
+				}
+	
+				renderer.render( scene, camera );
+				labelRenderer.render( scene, camera );
+
+			}
+
+
+		</script>
+
+	<link href="pickr-master/dist/themes/classic.min.css" rel="stylesheet">
+<link href="pickr-master/dist/themes/monolith.min.css" rel="stylesheet">
+<link href="pickr-master/dist/themes/nano.min.css" rel="stylesheet">
+	 
+<script src="pickr-master/dist/pickr.es5.min.js"></script>
+<script src="pickr-master/st/script.js"></script>
+	 
+<div class="pcr-app" data-theme="nano" aria-label="color picker dialog" role="form" style="z-index:10;left: 464.794px; top: 387.562px;">
+          <div class="pcr-selection">
+            <div class="pcr-color-preview">
+              <button type="button" class="pcr-last-color" aria-label="use previous color" style="color: rgb(66, 68, 90);"></button>
+              <div class="pcr-current-color" style="color: rgb(66, 68, 90);"></div>
+            </div>
+
+            <div class="pcr-color-palette">
+              <div class="pcr-picker" style="left: calc(26.6667% - 9px); top: calc(64.7059% - 9px); background: rgb(66, 68, 90);"></div>
+              <div class="pcr-palette" tabindex="0" aria-label="color selection area" role="listbox" style="background: linear-gradient(to top, rgb(0, 0, 0), transparent), linear-gradient(to left, rgb(0, 21, 255), rgb(255, 255, 255));"></div>
+            </div>
+
+            <div class="pcr-color-chooser">
+              <div class="pcr-picker" style="left: calc(65.2778% - 9px); background-color: rgb(0, 21, 255);"></div>
+              <div class="pcr-hue pcr-slider" tabindex="0" aria-label="hue selection slider" role="slider"></div>
+            </div>
+
+            <div class="pcr-color-opacity">
+              <div class="pcr-picker" style="left: calc(100% - 9px); background: rgb(0, 0, 0);"></div>
+              <div class="pcr-opacity pcr-slider" tabindex="0" aria-label="opacity selection slider" role="slider"></div>
+            </div>
+          </div>
+
+          <div class="pcr-swatches "><button type="button" style="color: rgba(244, 67, 54, 1)" aria-label="color swatch"></button><button type="button" style="color: rgba(233, 30, 99, 0.95)" aria-label="color swatch"></button><button type="button" style="color: rgba(156, 39, 176, 0.9)" aria-label="color swatch"></button><button type="button" style="color: rgba(103, 58, 183, 0.85)" aria-label="color swatch"></button><button type="button" style="color: rgba(63, 81, 181, 0.8)" aria-label="color swatch"></button><button type="button" style="color: rgba(33, 150, 243, 0.75)" aria-label="color swatch"></button><button type="button" style="color: rgba(3, 169, 244, 0.7)" aria-label="color swatch"></button></div> 
+
+          <div class="pcr-interaction">
+            <input class="pcr-result" type="text" spellcheck="false">
+
+            <input class="pcr-type active" data-type="HEXA" value="HEXA" type="button" style="display:none" hidden="">
+            <input class="pcr-type" data-type="RGBA" value="RGBA" type="button" style="display:none" hidden="">
+            <input class="pcr-type" data-type="HSLA" value="HSLA" type="button" style="display:none" hidden="">
+            <input class="pcr-type" data-type="HSVA" value="HSVA" type="button" style="display:none" hidden="">
+            <input class="pcr-type" data-type="CMYK" value="CMYK" type="button" style="display:none" hidden="">
+
+            <input class="pcr-save" value="Save" type="button" aria-label="save and exit">
+            <input class="pcr-cancel" value="Cancel" type="button" style="display:none" hidden="" aria-label="cancel and exit">
+            <input class="pcr-clear" value="Clear" type="button" aria-label="clear and exit">
+          </div>
+        </div>
+
+
+<div class="pcr-app" data-theme="nano" aria-label="color picker dialog" role="form" style="z-index:10;left: 464.794px; top: 387.562px;">
+          <div class="pcr-selection">
+            <div class="pcr-color-preview">
+              <button type="button" class="pcr-last-color" aria-label="use previous color" style="color: rgb(66, 68, 90);"></button>
+              <div class="pcr-current-color" style="color: rgb(66, 68, 90);"></div>
+            </div>
+
+            <div class="pcr-color-palette">
+              <div class="pcr-picker" style="left: calc(26.6667% - 9px); top: calc(64.7059% - 9px); background: rgb(66, 68, 90);"></div>
+              <div class="pcr-palette" tabindex="0" aria-label="color selection area" role="listbox" style="background: linear-gradient(to top, rgb(0, 0, 0), transparent), linear-gradient(to left, rgb(0, 21, 255), rgb(255, 255, 255));"></div>
+            </div>
+
+            <div class="pcr-color-chooser">
+              <div class="pcr-picker" style="left: calc(65.2778% - 9px); background-color: rgb(0, 21, 255);"></div>
+              <div class="pcr-hue pcr-slider" tabindex="0" aria-label="hue selection slider" role="slider"></div>
+            </div>
+
+            <div class="pcr-color-opacity">
+              <div class="pcr-picker" style="left: calc(100% - 9px); background: rgb(0, 0, 0);"></div>
+              <div class="pcr-opacity pcr-slider" tabindex="0" aria-label="opacity selection slider" role="slider"></div>
+            </div>
+          </div>
+
+          <div class="pcr-swatches "><button type="button" style="color: rgba(244, 67, 54, 1)" aria-label="color swatch"></button><button type="button" style="color: rgba(233, 30, 99, 0.95)" aria-label="color swatch"></button><button type="button" style="color: rgba(156, 39, 176, 0.9)" aria-label="color swatch"></button><button type="button" style="color: rgba(103, 58, 183, 0.85)" aria-label="color swatch"></button><button type="button" style="color: rgba(63, 81, 181, 0.8)" aria-label="color swatch"></button><button type="button" style="color: rgba(33, 150, 243, 0.75)" aria-label="color swatch"></button><button type="button" style="color: rgba(3, 169, 244, 0.7)" aria-label="color swatch"></button></div> 
+
+          <div class="pcr-interaction">
+            <input class="pcr-result" type="text" spellcheck="false">
+
+            <input class="pcr-type active" data-type="HEXA" value="HEXA" type="button" style="display:none" hidden="">
+            <input class="pcr-type" data-type="RGBA" value="RGBA" type="button" style="display:none" hidden="">
+            <input class="pcr-type" data-type="HSLA" value="HSLA" type="button" style="display:none" hidden="">
+            <input class="pcr-type" data-type="HSVA" value="HSVA" type="button" style="display:none" hidden="">
+            <input class="pcr-type" data-type="CMYK" value="CMYK" type="button" style="display:none" hidden="">
+
+            <input class="pcr-save" value="Save" type="button" aria-label="save and exit">
+            <input class="pcr-cancel" value="Cancel" type="button" style="display:none" hidden="" aria-label="cancel and exit">
+            <input class="pcr-clear" value="Clear" type="button" aria-label="clear and exit">
+          </div>
+        </div>
+
+
+	</body>
+</html>

@@ -6,19 +6,43 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
 	
+	<meta name="theme-color" content="#000000" />
+	<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+	<meta name="GENERATOR" content="Freeway Pro 6.1.2">
+	<meta name="description" content="Algorithm Visualizers by Brandon Sovran">
+	<meta name="keywords" content="Algorithm Visualizers, RedBlack Tree, Binary Tree, 3D Graph Space">
+	
 	<!-- BOOTSTRAP -->
 	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
 	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+	<script>document.documentElement.className="js";var supportsCssVars=function(){var e,t=document.createElement("style");return t.innerHTML="root: { --tmp-var: bold; }",document.head.appendChild(t),e=!!(window.CSS&&window.CSS.supports&&window.CSS.supports("font-weight","var(--tmp-var)")),t.parentNode.removeChild(t),e};supportsCssVars()||alert("Please view this demo in a modern browser that supports CSS Variables.");</script>
 	
 <style>
 
 /* GLOBAL STYLES */
 body {
   background: #34495e;
-  padding-top: 5em;
   display: flex;
+  overflow-x:hidden;
   justify-content: center;
+}
+
+body::-webkit-scrollbar-track
+{
+	-webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.3);
+	background-color: #F5F5F5;
+}
+
+body::-webkit-scrollbar
+{
+	width: 6px;
+	background-color: #F5F5F5;
+}
+
+body::-webkit-scrollbar-thumb
+{
+	background-color: #2c7bc9;
 }
 
 /* DEMO-SPECIFIC STYLES */
@@ -44,7 +68,7 @@ body {
 /* The typewriter cursor effect */
 @keyframes blink-caret {
   from, to { border-color: transparent }
-  50% { border-color: #337ab7 }
+  50% { border-color: #3098ff }
 }
 
 .title{
@@ -62,7 +86,23 @@ body {
 	left:0px;
 	width:100%;
 	height:100%;
-	background: #34495e;
+	
+}
+
+.scene{
+	position:absolute;
+	top:0px;
+	left:0px;
+	width:100%;
+	height:100%;
+}
+
+.scene2{
+	position:absolute;
+	top:0px;
+	left:0px;
+	width:100%;
+	height:100%;
 }
 
 .links{
@@ -109,24 +149,72 @@ body {
 	color: #fff;
 	}
 
+@media only screen and (max-width: 580px) {
+ .glyphicon-menu-down{
+	margin-left: -8px;
+ }
+ .box{
+	left:-5px;
+ }
+ .title{
+	width:90%;
+	left:50%;
+	transform: translate(-50%, -50%);
+	top:44%;
+ }
+ .typewriter h1 {
+	text-align:center;
+	white-space: normal;
+  }
+}
+
 </style>
 </head>
 <body>
 
 <div class="wrapper">
+
+<span id="graphWrapper">
+<canvas class="scene scene--full" id="scene"></canvas>
+				<script type="x-shader/x-vertex" id="wrapVertexShader">
+					attribute float size;
+					attribute vec3 color;
+					varying vec3 vColor;
+					void main() {
+						vColor = color;
+						vec4 mvPosition = modelViewMatrix * vec4( position, 1.0 );
+						gl_PointSize = size * ( 350.0 / - mvPosition.z );
+						gl_Position = projectionMatrix * mvPosition;
+					}
+				</script>
+				<script type="x-shader/x-fragment" id="wrapFragmentShader">
+					varying vec3 vColor;
+					uniform sampler2D texture;
+					void main(){
+						vec4 textureColor = texture2D( texture, gl_PointCoord );
+						if ( textureColor.a < 0.3 ) discard;
+						vec4 color = vec4(vColor.xyz, 1.0) * textureColor;
+						gl_FragColor = color;
+					}
+				</script>
+</span>
 <div class="title">
 <div class="typewriter">
   <h1>ALGORITHM VISUALIZERS.</h1>
 </div>
 </div>
-<span class="glyphicon glyphicon-menu-down" aria-hidden="true"></span>
+<span id="downButton" class="glyphicon glyphicon-menu-down" aria-hidden="true"></span>
 </div>
 
 <div class="links">
+<canvas class="scene scene--full" id="scene2"></canvas>
 <div class="box">
+				
 	<a href="BinaryTree.html"><span class="glyphicon glyphicon-menu-right " aria-hidden="true"></span> BINARY TREE VISUALIZER</a>
 	<br>
 	<a href="RedBlackTree.html"><span class="glyphicon glyphicon-menu-right " aria-hidden="true"></span> REDBLACK TREE VISUALIZER</a>
+	<br>
+	<a href="./3D"><span class="glyphicon glyphicon-menu-right " aria-hidden="true"></span> 3D GRAPH SPACE</a>
 	<br>
 	<a href="#"><span class="glyphicon glyphicon-menu-right " aria-hidden="true"></span> COMING SOON...</a>
 </div>
@@ -134,13 +222,31 @@ body {
 
 <script>
 $(window).scroll(function(){
-    $(".wrapper").css("opacity", 1 - $(window).scrollTop() / 250);
+    $(".wrapper").css("opacity", 1 - $(window).scrollTop() / 300);
   });
-  
+
   $(window).scroll(function(){
-    $(".box").css("opacity", 0 + $(window).scrollTop() / 950);
+    $(".box").css("opacity", 0 + $(window).scrollTop() / 1050);
+  });
+  $(window).scroll(function(){
+    $("#scene2").css("opacity", 0 + $(window).scrollTop() / 1200);
   });
 </script>
+
+<script>
+$("#downButton").click(function() {
+    $('html,body').animate({
+        scrollTop: $(".links").offset().top},
+        'slow');
+});
+</script>
+
+
+<script src="3D/src/three.js" type="module"></script>
+<script src="3D/src/TweenMax.min.js" type="module"></script>
+<script src="graph.js" type="module"></script>
+<script src="3D/src/perlin.js"></script>
+<script src="graph2.js" type="module"></script>
 
 </body>
 </html>
